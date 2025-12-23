@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DōM - Breathe • Be • Collaborate</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>DōM</h1>
+                <p>Breathe • Be • Collaborate</p>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="home">Home</button>
+                <button class="nav-btn" data-section="directory">Directory</button>
+                <button class="nav-btn" data-section="needs">Needs Board</button>
+                <button class="nav-btn" data-section="calendar">Events</button>
+                <button class="nav-btn" id="checkInNavBtn" data-section="checkin" style="display: none;">Check In</button>
+                <button class="nav-btn" id="profileNavBtn" data-section="profile" style="display: none;">My Profile</button>
+                <button class="auth-btn" id="authBtn">Login</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- HOME SECTION -->
+        <section class="section active" id="home">
+            <div class="container">
+                <!-- Hero -->
+                <div class="hero">
+                    <h2>Find Your Perfect Creative Collaborator</h2>
+                    <p>Connect with talented creatives, showcase your work, and find the perfect collaborator for your next project.</p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number" id="memberCount">0</span>
+                            <span class="stat-label">Active Members</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="checkedInCount">0</span>
+                            <span class="stat-label">Checked In</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="needsCount">0</span>
+                            <span class="stat-label">Open Needs</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="eventsCount">0</span>
+                            <span class="stat-label">Upcoming Events</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Events Preview -->
+                <div class="featured-section">
+                    <h3>Upcoming Events</h3>
+                    <div id="upcomingEvents"></div>
+                </div>
+
+                <!-- Featured Members -->
+                <div class="featured-section">
+                    <h3>Recent Member Spotlights</h3>
+                    <div class="member-grid" id="featuredMembers"></div>
+                </div>
+
+                <!-- Latest Needs -->
+                <div class="featured-section">
+                    <h3>Latest Needs</h3>
+                    <div class="needs-preview" id="latestNeeds"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIRECTORY SECTION -->
+        <section class="section" id="directory">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Member Directory</h2>
+                    <div class="search-filters">
+                        <input type="text" id="memberSearch" placeholder="Search members...">
+                        <select id="skillFilter">
+                            <option value="">All Skills</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="member-grid" id="memberGrid"></div>
+            </div>
+        </section>
+
+        <!-- NEEDS BOARD SECTION -->
+        <section class="section" id="needs">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Needs Board</h2>
+                    <button class="btn btn-primary" id="postNeedBtn">Post a Need</button>
+                </div>
+                <div class="needs-grid" id="needsGrid"></div>
+            </div>
+        </section>
+
+        <!-- CALENDAR SECTION -->
+        <section class="section" id="calendar">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Community Events</h2>
+                    <button class="btn btn-primary" id="createEventBtn" style="display: none;">Create Event</button>
+                </div>
+                
+                <!-- Upcoming Events Grid (Next 7 Days) -->
+                <div class="events-section">
+                    <h3>Upcoming Events (Next 7 Days)</h3>
+                    <div id="upcomingWeekEvents" class="events-grid"></div>
+                </div>
+
+                <!-- Google Calendar Embed -->
+                <div class="google-calendar-section">
+                    <h3>Community Calendar</h3>
+                    <iframe 
+                        src="https://calendar.google.com/calendar/embed?src=d392dc35dbd1a2f8807f396fcc095f16fe662aaabce1ac6df94e2100aae3378c%40group.calendar.google.com&ctz=America%2FNew_York" 
+                        style="border: 4px solid #000" 
+                        width="100%" 
+                        height="600" 
+                        frameborder="0" 
+                        scrolling="no">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHECK-IN SECTION -->
+        <section class="section" id="checkin">
+            <div class="container">
+                <div class="section-header">
+                    <h2>DōM Space Check-In</h2>
+                </div>
+
+                <!-- User Check-In Card -->
+                <div class="checkin-container" id="userCheckinCard" style="display: none;">
+                    <div class="checkin-status-card">
+                        <h3>Your Status</h3>
+                        <div class="current-status-display">
+                            <div class="status-indicator-text" id="userStatusIndicator">
+                                <span class="status-text" id="userStatusText">Checking...</span>
+                            </div>
+                            <button class="circular-checkin-btn" id="toggleStatusBtn">
+                                <span class="btn-inner">
+                                    <span class="btn-icon" id="toggleStatusIcon">●</span>
+                                    <span class="btn-text" id="toggleStatusText">Check In</span>
+                                </span>
+                            </button>
+                            <p class="status-time" id="userStatusTime"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Controls -->
+                <div class="admin-checkin-controls" id="adminCheckinControls" style="display: none;">
+                    <h3>Admin Controls - Who's in the Space</h3>
+                    
+                    <div class="checkin-stats">
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalInSpace">0</span>
+                            <span class="stat-label">Currently In</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalCheckedOut">0</span>
+                            <span class="stat-label">Checked Out</span>
+                        </div>
+                    </div>
+
+                    <div class="checkin-filters">
+                        <button class="filter-btn active" data-filter="all">All Members</button>
+                        <button class="filter-btn" data-filter="in">In Space</button>
+                        <button class="filter-btn" data-filter="out">Checked Out</button>
+                    </div>
+
+                    <div class="checkin-list" id="adminCheckinList"></div>
+                </div>
+
+                <!-- Access Denied Message -->
+                <div class="access-denied" id="checkinAccessDenied" style="display: none;">
+                    <h3>⚠️ Verified Members Only</h3>
+                    <p>This feature is only available to verified members. Please contact an admin to get verified.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFILE SECTION -->
+        <section class="section" id="profile">
+            <div class="container">
+                <div class="profile-container">
+                    <!-- Profile Form -->
+                    <div class="profile-form">
+                        <h2>My Profile</h2>
+                        
+                        <!-- Status Banner -->
+                        <div id="userStatusBanner" style="padding: 1rem; margin-bottom: 1rem; border: 3px solid #000; text-align: center; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">
+                            <span id="statusText">Loading status...</span>
+                        </div>
+
+                        <form id="profileForm">
+                            <!-- Basic Info -->
+                            <div class="form-group">
+                                <label for="profileName">Full Name *</label>
+                                <input type="text" id="profileName" required>
+                            </div>
+
+                            <h3 class="section-divider">Profile Photos</h3>
+                            <div class="form-group">
+                                <label>Tap to add photos (first photo is your cover)</label>
+                                <input type="file" id="profilePhotosInput" accept="image/*" multiple style="display: none;">
+                                <input type="url" id="profileAvatar" style="display: none;">
+                                <div id="profilePhotosGrid" class="profile-photos-grid">
+                                    <div class="photo-add-btn" onclick="document.getElementById('profilePhotosInput').click()">
+                                        <span>+</span>
+                                        <small>Add Photos</small>
+                                    </div>
+                                </div>
+                                <p id="avatarUploadStatus" style="font-size: 0.9rem; margin-top: 0.5rem; font-weight: 700;"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileBio">Bio</label>
+                                <textarea id="profileBio" rows="4" placeholder="Tell us about yourself and your creative work..."></textarea>
+                            </div>
+
+                            <!-- Skills -->
+                            <div class="form-group">
+                                <label for="profileSkills">Skills (comma-separated)</label>
+                                <input type="text" id="profileSkills" placeholder="e.g., Web Design, Photography, Writing">
+                                <div class="skills-suggestions">
+                                    <span class="skill-tag" data-skill="Web Design">Web Design</span>
+                                    <span class="skill-tag" data-skill="Graphic Design">Graphic Design</span>
+                                    <span class="skill-tag" data-skill="Photography">Photography</span>
+                                    <span class="skill-tag" data-skill="Writing">Writing</span>
+                                    <span class="skill-tag" data-skill="Video Production">Video Production</span>
+                                    <span class="skill-tag" data-skill="Music Production">Music Production</span>
+                                    <span class="skill-tag" data-skill="Illustration">Illustration</span>
+                                    <span class="skill-tag" data-skill="Marketing">Marketing</span>
+                                    <span class="skill-tag" data-skill="3D Modeling">3D Modeling</span>
+                                    <span class="skill-tag" data-skill="Animation">Animation</span>
+                                </div>
+                            </div>
+
+                            <!-- Links -->
+                            <div class="form-group">
+                                <label for="profileWebsite">Personal Website</label>
+                                <input type="url" id="profileWebsite" placeholder="https://yourwebsite.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profilePortfolio">Portfolio URL</label>
+                                <input type="url" id="profilePortfolio" placeholder="https://yourportfolio.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileSocial">Social Media</label>
+                                <input type="text" id="profileSocial" placeholder="@username or profile link">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileContact">Contact Info</label>
+                                <input type="text" id="profileContact" placeholder="Preferred contact method">
+                            </div>
+                            
+                            <!-- Portfolio Projects -->
+                            <h3 class="section-divider">Portfolio Projects</h3>
+                            <div id="portfolioProjects">
+                                <p class="empty-state">Add projects to showcase your work</p>
+                            </div>
+                            <button type="button" class="btn btn-outline mb-3" id="addProjectBtn">Add Project</button>
+                            
+                            
+                            
+                            <button type="submit" class="btn btn-primary">Save Profile</button>
+                        </form>
+                    </div>
+
+                    <!-- Profile Preview -->
+                    <div class="profile-preview" id="profilePreview">
+                        <h3>Profile Preview</h3>
+                        <div class="member-card">
+                            <div class="member-avatar" id="previewAvatar">
+                                <div class="avatar-placeholder">Photo</div>
+                            </div>
+                            <div class="member-info">
+                                <h4 id="previewName">Your Name</h4>
+                                <p id="previewBio">Your bio will appear here...</p>
+                                <div class="member-skills" id="previewSkills"></div>
+                                <div id="previewPortfolio" style="margin-top: 1.5rem;">
+                                    <h4>Portfolio Projects</h4>
+                                    <div id="previewProjects"></div>
+                                </div>
+                                <div class="member-actions">
+                                    <a href="#" id="previewPortfolioLink" class="btn btn-outline">Portfolio</a>
+                                    <button class="btn btn-primary" disabled>Contact</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODALS -->
+    
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="authModalTitle">Login</h3>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="authEmail">Email</label>
+                    <input type="email" id="authEmail" required>
+                </div>
+                <div class="form-group" id="authPasswordGroup">
+                    <label for="authPassword">Password</label>
+                    <input type="password" id="authPassword" required>
+                </div>
+                <div class="form-group" id="authNameGroup" style="display: none;">
+                    <label for="authName">Full Name</label>
+                    <input type="text" id="authName">
+                </div>
+                <button type="submit" class="btn btn-primary" id="authSubmit">Login</button>
+                
+                <div style="text-align: center; margin: 1.5rem 0; position: relative;">
+                    <span style="background: #fff; padding: 0 1rem; position: relative; z-index: 1;">OR</span>
+                    <hr style="border: 2px solid #000; margin-top: -1.2rem;">
+                </div>
+                
+                <button type="button" class="btn btn-outline" id="googleSignInBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" fill-rule="evenodd">
+                            <path d="M17.6 9.2l-.1-1.8H9v3.4h4.8C13.6 12 13 13 12 13.6v2.2h3a8.8 8.8 0 0 0 2.6-6.6z" fill="#4285F4" fill-rule="nonzero"/>
+                            <path d="M9 18c2.4 0 4.5-.8 6-2.2l-3-2.2a5.4 5.4 0 0 1-8-2.9H1V13a9 9 0 0 0 8 5z" fill="#34A853" fill-rule="nonzero"/>
+                            <path d="M4 10.7a5.4 5.4 0 0 1 0-3.4V5H1a9 9 0 0 0 0 8l3-2.3z" fill="#FBBC05" fill-rule="nonzero"/>
+                            <path d="M9 3.6c1.3 0 2.5.4 3.4 1.3L15 2.3A9 9 0 0 0 1 5l3 2.4a5.4 5.4 0 0 1 5-3.7z" fill="#EA4335" fill-rule="nonzero"/>
+                        </g>
+                    </svg>
+                    Sign in with Google
+                </button>
+                
+                <p class="auth-toggle">
+                    <span id="authToggleText">Don't have an account?</span>
+                    <a href="#" id="authToggleLink">Sign up</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div class="modal" id="onboardingModal">
+        <div class="modal-content onboarding-content">
+            <h3>Welcome to DōM!</h3>
+            <p class="onboarding-intro">Let's set up your profile so other members can discover your talents.</p>
+            
+            <form id="onboardingForm">
+                <!-- Step 1: Basic Info -->
+                <div class="onboarding-step active" data-step="1">
+                    <h4>Step 1: Basic Information</h4>
+                    <div class="form-group">
+                        <label for="onboardName">Full Name *</label>
+                        <input type="text" id="onboardName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="onboardBio">Tell us about yourself *</label>
+                        <textarea id="onboardBio" rows="4" required placeholder="What do you create? What are you passionate about?"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="app.nextOnboardingStep()">Next</button>
+                </div>
+
+                <!-- Step 2: Skills -->
+                <div class="onboarding-step" data-step="2">
+                    <h4>Step 2: Your Skills</h4>
+                    <div class="form-group">
+                        <label for="onboardSkills">Select your skills</label>
+                        <div class="skills-grid">
+                            <label class="skill-checkbox"><input type="checkbox" value="Web Design"> Web Design</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Graphic Design"> Graphic Design</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Photography"> Photography</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Writing"> Writing</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Video Production"> Video Production</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Music Production"> Music Production</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Illustration"> Illustration</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Marketing"> Marketing</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="3D Modeling"> 3D Modeling</label>
+                            <label class="skill-checkbox"><input type="checkbox" value="Animation"> Animation</label>
+                        </div>
+                        <input type="text" id="onboardOtherSkills" placeholder="Other skills (comma-separated)">
+                    </div>
+                    <div class="onboarding-nav">
+                        <button type="button" class="btn btn-outline" onclick="app.prevOnboardingStep()">Back</button>
+                        <button type="button" class="btn btn-primary" onclick="app.nextOnboardingStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Your Work -->
+                <div class="onboarding-step" data-step="3">
+                    <h4>Step 3: Your Work (Optional)</h4>
+<p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Add links to showcase your work - you can skip this and add them later!</p>
+                    <div class="form-group">
+                        <label for="onboardPortfolio">Portfolio URL</label>
+                        <input type="url" id="onboardPortfolio" placeholder="https://yourportfolio.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="onboardWebsite">Personal Website</label>
+                        <input type="url" id="onboardWebsite" placeholder="https://yourwebsite.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="onboardSocial">Social Media</label>
+                        <input type="text" id="onboardSocial" placeholder="@username or profile link">
+                    </div>
+                    <div class="onboarding-nav">
+                        <button type="button" class="btn btn-outline" onclick="app.prevOnboardingStep()">Back</button>
+                        <button type="submit" class="btn btn-primary">Complete Profile</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Need Modal -->
+    <div class="modal" id="needModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Post a Need</h3>
+            <form id="needForm">
+                <div class="form-group">
+                    <label for="needTitle">Title *</label>
+                    <input type="text" id="needTitle" required placeholder="What do you need help with?">
+                </div>
+                <div class="form-group">
+                    <label for="needDescription">Description *</label>
+                    <textarea id="needDescription" rows="4" required placeholder="Describe your project and requirements..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="needSkills">Required Skills (comma-separated)</label>
+                    <input type="text" id="needSkills" placeholder="e.g., Web Design, Photography">
+                </div>
+                <div class="form-group">
+                    <label for="needBudget">Budget Range</label>
+                    <select id="needBudget">
+                        <option value="">Select budget range</option>
+                        <option value="Under $500">Under $500</option>
+                        <option value="$500 - $1,500">$500 - $1,500</option>
+                        <option value="$1,500 - $5,000">$1,500 - $5,000</option>
+                        <option value="$5,000+">$5,000+</option>
+                        <option value="Collaboration/Trade">Collaboration/Trade</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="needDeadline">Deadline (Optional)</label>
+                    <input type="date" id="needDeadline">
+                </div>
+                <button type="submit" class="btn btn-primary">Post Need</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Create Event</h3>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="eventTitle">Event Title *</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription">Description</label>
+                    <textarea id="eventDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Date *</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventTime">Time</label>
+                    <input type="time" id="eventTime">
+                </div>
+                <div class="form-group">
+                    <label for="eventLocation">Location</label>
+                    <input type="text" id="eventLocation" placeholder="Online or physical address">
+                </div>
+                <div class="form-group">
+                    <label for="eventType">Event Type</label>
+                    <select id="eventType">
+                        <option value="Workshop">Workshop</option>
+                        <option value="Meetup">Meetup</option>
+                        <option value="Exhibition">Exhibition</option>
+                        <option value="Networking">Networking</option>
+                        <option value="Collaboration">Collaboration Session</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="addToGoogleCalendar" checked style="width: auto;">
+                        <span>Also add to Google Calendar</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Event</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add Portfolio Project</h3>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label for="projectTitle">Project Title *</label>
+                    <input type="text" id="projectTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDescription">Description</label>
+                    <textarea id="projectDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="projectImage">Project Image</label>
+                    <input type="file" id="projectImageFile" accept="image/*" style="display: none;">
+                    <div style="display: flex; gap: 0;">
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('projectImageFile').click()">Choose File</button>
+                        <button type="button" class="btn btn-outline" id="uploadProjectImageBtn" style="margin-left: -3px;">Upload</button>
+                    </div>
+                    <input type="url" id="projectImage" placeholder="Or paste image URL" style="margin-top: 1rem;">
+                    <div id="projectImagePreview" class="image-preview"></div>
+                    <p id="projectImageUploadStatus" style="font-size: 0.9rem; margin-top: 0.5rem;"></p>
+                </div>
+                <div class="form-group">
+                    <label for="projectLink">Project Link</label>
+                    <input type="url" id="projectLink" placeholder="https://example.com/project">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Project</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Member Modal -->
+    <div class="modal" id="memberModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="memberModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Send Message</h3>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="messageSubject">Subject</label>
+                    <input type="text" id="messageSubject" required>
+                </div>
+                <div class="form-group">
+                    <label for="messageContent">Message</label>
+                    <textarea id="messageContent" rows="6" required placeholder="Write your message..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+    <!-- Gallery Viewer Modal -->
+    <div class="modal" id="galleryModal">
+        <div class="modal-content" style="max-width: 90%; max-height: 90vh; padding: 1rem;">
+            <span class="close">&times;</span>
+            <div id="galleryViewer" style="display: flex; flex-direction: column; height: 100%;">
+                <img id="galleryImage" src="" alt="Gallery" style="max-width: 100%; max-height: 70vh; object-fit: contain; border: 3px solid #000; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-outline" onclick="app.prevGalleryImage()">← Previous</button>
+                    <span id="galleryCounter" style="font-weight: 900;">1 / 1</span>
+                    <button class="btn btn-outline" onclick="app.nextGalleryImage()">Next →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+   <!--  <div id="mobileDebug" style="position:fixed;bottom:0;left:0;right:0;height:150px;background:#000;color:#0f0;font-family:monospace;font-size:12px;overflow-y:auto;z-index:9999;padding:10px;display:block;"></div>
+ <script>
+    (function(){
+        var log = document.getElementById('mobileDebug');
+        var origLog = console.log;
+        console.log = function(){
+            var args = Array.from(arguments).map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+            log.innerHTML += args + '<br>';
+            log.scrollTop = log.scrollHeight;
+            origLog.apply(console, arguments);
+        };
+    })();
+    </script>
+-->
+</html>
